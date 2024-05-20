@@ -3,7 +3,6 @@ package repository
 import (
 	"a21hc3NpZ25tZW50/model"
 	"database/sql"
-	"fmt"
 )
 
 type StudentRepository interface {
@@ -23,7 +22,28 @@ func NewStudentRepo(db *sql.DB) *studentRepoImpl {
 }
 
 func (s *studentRepoImpl) FetchAll() ([]model.Student, error) {
-	return []model.Student{}, nil // TODO: replace this
+	var students []model.Student
+	query := "SELECT id, name, address, class FROM students"
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var student model.Student
+		err := rows.Scan(&student.ID, &student.Name, &student.Address, &student.Class)
+		if err != nil {
+			return nil, err
+		}
+		students = append(students, student)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return students, nil // TODO: replace this
 }
 
 func (s *studentRepoImpl) FetchByID(id int) (*model.Student, error) {
@@ -39,13 +59,26 @@ func (s *studentRepoImpl) FetchByID(id int) (*model.Student, error) {
 }
 
 func (s *studentRepoImpl) Store(student *model.Student) error {
+
+	_, err := s.db.Exec("INSERT INTO students (name, address, class) VALUES ($1, $2, $3)", student.Name, student.Address, student.Class)
+	if err != nil {
+		return err
+	}
 	return nil // TODO: replace this
 }
 
 func (s *studentRepoImpl) Update(id int, student *model.Student) error {
+	_, err := s.db.Exec("UPDATE students SET name = $1, address = $2, class= $3 WHERE id = $4", student.Name, student.Address, student.Class, id)
+	if err != nil {
+		return err
+	}
 	return nil // TODO: replace this
 }
 
 func (s *studentRepoImpl) Delete(id int) error {
-	return fmt.Errorf("Replace this error!") // TODO: replace this
+	_, err := s.db.Exec("DELETE FROM students WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	return nil // TODO: replace this
 }
