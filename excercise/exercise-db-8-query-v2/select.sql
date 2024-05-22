@@ -1,5 +1,1 @@
--- TODO: answer here
-SELECT CONCAT(FIRST_NAME, ' ', LAST_NAME) AS FULLNAME
-FROM people;
-
-SELECT * FROM people WHERE GENDER 'laki-laki' ORDER BY WEIGHT DESC
+select id, nik, concat(first_name, ' ', last_name) as fullname, date_of_birth, weight, address from people WHERE gender='laki-laki' order by weight DESC LIMIT 5
